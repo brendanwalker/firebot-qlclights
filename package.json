@@ -1,8 +1,8 @@
 {
   "name": "firebot-custom-script-starter",
-  "scriptOutputName": "starterScript",
+  "scriptOutputName": "firebot-qlclights",
   "version": "1.0.0",
-  "description": "A starter Firebot custom script",
+  "description": "A QLC Lights plugin for Firebot",
   "main": "",
   "scripts": {
     "build": "webpack",
@@ -10,7 +10,7 @@
     "copy": "node ./scripts/copy-build.js",
     "test": "jest"
   },
-  "author": "ebiggz",
+  "author": "brendanwalker",
   "license": "GNU3",
   "devDependencies": {
     "@crowbartools/firebot-custom-scripts-types": "^5.60.1",
