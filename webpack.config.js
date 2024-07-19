@@ -1,11 +1,13 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const packageJson = require("./package.json");
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   target: "node",
   mode: "production",
   devtool: false,
+  externals: [nodeExternals()],
   entry: {
     main: "./src/main.ts",
   },

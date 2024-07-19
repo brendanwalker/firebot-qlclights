@@ -1,10 +1,9 @@
 import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
+import { initLogger, logger } from "./logger";
+import { setupFrontendListeners } from "./firebot/communicator";
+import { getQlcIntegration } from "./firebot/qlc-integration";
 
-interface Params {
-  message: string;
-}
-
-const script: Firebot.CustomScript<Params> = {
+const script: Firebot.CustomScript = {
   getScriptManifest: () => {
     return {
       name: "Starter Custom Script",
@@ -15,18 +14,43 @@ const script: Firebot.CustomScript<Params> = {
     };
   },
   getDefaultParameters: () => {
-    return {
-      message: {
-        type: "string",
-        default: "Hello World!",
-        description: "Message",
-        secondaryDescription: "Enter a message here",
-      },
-    };
+    return {};
   },
-  run: (runRequest) => {
-    const { logger } = runRequest.modules;
-    logger.info(runRequest.parameters.message);
+  run: ({ modules }) => {
+    initLogger(modules.logger);
+
+    logger.info("Starting QLC Control...");
+
+    const {
+      effectManager,
+      eventManager,
+      frontendCommunicator,
+      replaceVariableManager,
+      eventFilterManager,
+      integrationManager,
+    } = modules;
+
+    setupFrontendListeners(frontendCommunicator);
+
+    const qlcIntegration = getQlcIntegration(eventManager);
+    integrationManager.registerIntegration(qlcIntegration);
+
+    // effectManager.registerEffect(ChangeSceneEffectType);
+    // effectManager.registerEffect(ChangeSceneCollectionEffectType);
+    // effectManager.registerEffect(ToggleSourceVisibilityEffectType);
+    // effectManager.registerEffect(ToggleSourceFilterEffectType);
+    // effectManager.registerEffect(ToggleSourceMutedEffectType);
+    // effectManager.registerEffect(StartStreamEffectType);
+    // effectManager.registerEffect(StopStreamEffectType);
+    // effectManager.registerEffect(StartVirtualCamEffectType);
+    // effectManager.registerEffect(StopVirtualCamEffectType);
+
+    // eventManager.registerEventSource(OBSEventSource);
+
+    // eventFilterManager.registerFilter(SceneNameEventFilter);
+
+    // replaceVariableManager.registerReplaceVariable(SceneNameVariable);
+    // replaceVariableManager.registerReplaceVariable(SceneCollectionNameVariable);
   },
 };
 
