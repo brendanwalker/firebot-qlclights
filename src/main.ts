@@ -2,6 +2,7 @@ import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
 import { initLogger, logger } from "./logger";
 import { setupFrontendListeners } from "./firebot/communicator";
 import { getQlcIntegration } from "./firebot/qlc-integration";
+import { ToggleQlcFunctionEffectType } from "./firebot/effects/toggle_qlc_function"
 
 const script: Firebot.CustomScript = {
   getScriptManifest: () => {
@@ -26,7 +27,6 @@ const script: Firebot.CustomScript = {
       eventManager,
       frontendCommunicator,
       replaceVariableManager,
-      eventFilterManager,
       integrationManager,
     } = modules;
 
@@ -35,19 +35,7 @@ const script: Firebot.CustomScript = {
     const qlcIntegration = getQlcIntegration(eventManager);
     integrationManager.registerIntegration(qlcIntegration);
 
-    // effectManager.registerEffect(ChangeSceneEffectType);
-    // effectManager.registerEffect(ChangeSceneCollectionEffectType);
-    // effectManager.registerEffect(ToggleSourceVisibilityEffectType);
-    // effectManager.registerEffect(ToggleSourceFilterEffectType);
-    // effectManager.registerEffect(ToggleSourceMutedEffectType);
-    // effectManager.registerEffect(StartStreamEffectType);
-    // effectManager.registerEffect(StopStreamEffectType);
-    // effectManager.registerEffect(StartVirtualCamEffectType);
-    // effectManager.registerEffect(StopVirtualCamEffectType);
-
-    // eventManager.registerEventSource(OBSEventSource);
-
-    // eventFilterManager.registerFilter(SceneNameEventFilter);
+    effectManager.registerEffect(ToggleQlcFunctionEffectType);
 
     // replaceVariableManager.registerReplaceVariable(SceneNameVariable);
     // replaceVariableManager.registerReplaceVariable(SceneCollectionNameVariable);

@@ -1,11 +1,12 @@
 
 import { ScriptModules } from "@crowbartools/firebot-custom-scripts-types";
-import {WebSocket} from "ws";
 import { logger } from "./logger";
+//import {WebSocket} from "websocket";
+var WebSocketClient = require('websocket').client;
 
 let eventManager: ScriptModules["eventManager"];
 
-let qlcSocket: WebSocket = null;
+let qlcSocket = new WebSocketClient();
 
 let isConnected = false;
 
@@ -81,17 +82,17 @@ export async function getFunctionType(functionId:number): Promise<string> {
     }
 }
 
-export async function getFunctionsStatus(functionId:number): Promise<string> {
+export async function getFunctionStatus(functionId:number): Promise<boolean> {
     try{
         const results = await sendRequest(["getFunctionStatus", functionId.toString()]);
-        return results[0];    
+        return results[0] !== "0";
     } catch(e) {
         logger.error(e.toString());
-        return "";
+        return false;
     }
 }
 
-export async function setFunctionsStatus(functionId:number, enabled:boolean): Promise<boolean> {
+export async function setFunctionStatus(functionId:number, enabled:boolean): Promise<boolean> {
     try{
         const success = await sendRequestNoResponse(
             ["setFunctionStatus", functionId.toString(), enabled ? "1" : "0"]);
@@ -293,16 +294,18 @@ async function maintainConnection(
         logger.debug("Trying to connect to QLC Websocket...");
       }
 
-      qlcSocket = new WebSocket(`ws://${ip}:${port}`);
+      qlcSocket.connect(`ws://${ip}:${port}`);
 
-      qlcSocket.on('error', logger.error);
+      qlcSocket.on('error', (error:any) => {
+            logger.error("Connection Error: " + error.toString());
+        });
 
       qlcSocket.on('open', () => {
         logger.info("Successfully isConnected to qlcSocket.");
         isConnected = true;
       });
 
-      qlcSocket.on('close', (code, reason) => {
+      qlcSocket.on('close', () => {
         if (!isConnected) return;
         isConnected = false;
         rejectAllPending("connection closed");
@@ -318,8 +321,8 @@ async function maintainConnection(
         }
       });
 
-      qlcSocket.on('message', function message(data) {
-        const msgParams:Array<string> = data.toString().split('|');
+      qlcSocket.on('message', (message:any) => {
+        const msgParams:Array<string> = message.utf8Data.toString().split('|');
 
         if (msgParams.length >= 2 && msgParams[0] == "QLC+API")
         {
